@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: blog_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: your-mysql-password  # 请修改为安全密码
+      MYSQL_DATABASE: blog
+      MYSQL_USER: blog
+      MYSQL_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis缓存
+  redis:
+    image: redis:6.2-alpine
+    container_name: blog_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # MinIO对象存储
+  minio:
+    image: minio/minio:latest
+    container_name: blog_minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: your-minio-user      # 请修改为安全用户名
+      MINIO_ROOT_PASSWORD: your-minio-pass  # 请修改为安全密码
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  # 博客应用
+  blog-api:
+    build: .
+    container_name: blog_api
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+      - minio
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=your-mysql-password      # 与MySQL服务密码保持一致
+      - DATABASE_DBNAME=blog
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY_ID=your-minio-user        # 与MinIO用户名保持一致
+      - MINIO_SECRET_ACCESS_KEY=your-minio-pass    # 与MinIO密码保持一致
+      - JWT_SECRET=your-production-jwt-secret-key  # 生产环境JWT密钥
+
+volumes:
+  mysql_data:
+  redis_data:
+  minio_data:
