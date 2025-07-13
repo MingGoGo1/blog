@@ -7,7 +7,7 @@ services:
     container_name: blog_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: your-mysql-password  # 请修改为安全密码
+      MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: blog
       MYSQL_USER: blog
       MYSQL_PASSWORD: 123456
@@ -34,8 +34,8 @@ services:
     container_name: blog_minio
     restart: always
     environment:
-      MINIO_ROOT_USER: your-minio-user      # 请修改为安全用户名
-      MINIO_ROOT_PASSWORD: your-minio-pass  # 请修改为安全密码
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -58,14 +58,14 @@ services:
       - DATABASE_HOST=mysql
       - DATABASE_PORT=3306
       - DATABASE_USER=root
-      - DATABASE_PASSWORD=your-mysql-password      # 与MySQL服务密码保持一致
+      - DATABASE_PASSWORD=123456
       - DATABASE_DBNAME=blog
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY_ID=your-minio-user        # 与MinIO用户名保持一致
-      - MINIO_SECRET_ACCESS_KEY=your-minio-pass    # 与MinIO密码保持一致
-      - JWT_SECRET=your-production-jwt-secret-key  # 生产环境JWT密钥
+      - MINIO_ACCESS_KEY_ID=admin
+      - MINIO_SECRET_ACCESS_KEY=admin123
+      - JWT_SECRET=qwertyuiopasdfghjklzxcvbnm,u6ytgjh
 
 volumes:
   mysql_data:

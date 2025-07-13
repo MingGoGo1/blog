@@ -8,6 +8,7 @@ import (
 )
 
 var jwtSecret = []byte("default-jwt-secret-please-change-in-production")
+var jwtExpireHour = 24 // 默认24小时
 
 type Claims struct {
 	UserID uint `json:"user_id"`
@@ -19,7 +20,7 @@ func GenerateToken(userID uint) (string, error) {
 	claims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour * 30)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(jwtExpireHour) * time.Hour * 30)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
@@ -49,4 +50,14 @@ func ParseToken(tokenString string) (*Claims, error) {
 // SetJWTSecret 设置JWT密钥
 func SetJWTSecret(secret string) {
 	jwtSecret = []byte(secret)
+}
+
+// SetJWTExpireHour 设置JWT过期时间（小时）
+func SetJWTExpireHour(hours int) {
+	jwtExpireHour = hours
+}
+
+// GetJWTExpireDuration 获取JWT过期时间（Duration）
+func GetJWTExpireDuration() time.Duration {
+	return time.Duration(jwtExpireHour) * time.Hour * 30
 }

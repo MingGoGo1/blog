@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"blog/internal/global"
 	"blog/internal/utils"
@@ -90,12 +89,15 @@ func (s *UserService) Login(ctx context.Context, req *req.UserLoginRequest) (*re
 	tokenKey := fmt.Sprintf("token:%s", token)
 	userTokensKey := fmt.Sprintf("user_tokens:%d", user.ID)
 
+	// 获取JWT过期时间
+	expireDuration := utils.GetJWTExpireDuration()
+
 	// 存储token信息，包含用户ID
-	global.Redis.Set(ctx, tokenKey, user.ID, 24*time.Hour*30)
+	global.Redis.Set(ctx, tokenKey, user.ID, expireDuration)
 	// 将token添加到用户的token集合中
 	global.Redis.SAdd(ctx, userTokensKey, token)
 	// 设置用户token集合的过期时间
-	global.Redis.Expire(ctx, userTokensKey, 24*time.Hour*30)
+	global.Redis.Expire(ctx, userTokensKey, expireDuration)
 
 	return &resp.UserLoginResponse{
 		Token: token,
