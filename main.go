@@ -21,11 +21,9 @@
 package main
 
 import (
-	"log"
-	"time"
-
 	"blog/internal/global"
 	initpkg "blog/internal/init"
+	"log"
 )
 
 func main() {
@@ -36,14 +34,6 @@ func main() {
 
 	// 初始化HTTP服务器
 	r := initpkg.InitHTTPServer()
-
-	// 启动一个定时器
-	go func() {
-		for {
-			<-time.After(1 * time.Hour)
-			log.Println("Heartbeat: Server is running")
-		}
-	}()
 
 	// 启动服务器
 	log.Printf("Server starting on port %s", global.Config.Server.Port)
