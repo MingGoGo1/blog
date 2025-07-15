@@ -68,6 +68,7 @@ func SetupRouter() *gin.Engine {
 		// 用户管理
 		auth.GET("/profile", userHandler.GetProfile)
 		auth.POST("/logout", userHandler.Logout)
+		auth.PUT("/profile", userHandler.UpdateProfile)
 
 		// 文章管理
 		auth.POST("/articles", articleHandler.CreateArticle)

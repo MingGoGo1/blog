@@ -141,21 +141,11 @@ func (s *ArticleService) UpdateArticle(ctx context.Context, id, userID uint, req
 
 	// 更新字段
 	updates := make(map[string]interface{})
-	if req.Title != "" {
-		updates["title"] = req.Title
-	}
-	if req.Content != "" {
-		updates["content"] = req.Content
-	}
-	if req.Summary != "" {
-		updates["summary"] = req.Summary
-	}
-	if req.CoverImage != "" {
-		updates["cover_image"] = req.CoverImage
-	}
-	if req.Tags != "" {
-		updates["tags"] = req.Tags
-	}
+	updates["title"] = req.Title
+	updates["content"] = req.Content
+	updates["summary"] = req.Summary
+	updates["cover_image"] = req.CoverImage
+	updates["tags"] = req.Tags
 
 	// 处理状态变更
 	if req.Status != article.Status {

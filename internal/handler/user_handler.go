@@ -148,3 +148,56 @@ func (h *UserHandler) Logout(c *gin.Context) {
 
 	utils.Success(c, "注销成功")
 }
+
+// UpdateProfile 更新用户资料
+// @Summary 更新用户资料
+// @Description 更新当前登录用户的资料
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body req.UserUpdateProfileRequest true "用户资料更新信息"
+// @Success 200 {object} resp.UserProfileResponse "更新成功"
+// @Failure 400 {object} utils.Response "参数错误"
+// @Failure 401 {object} utils.Response "未登录"
+// @Router /api/v1/profile [put]
+func (h *UserHandler) UpdateProfile(c *gin.Context) {
+
+	// 获取当前用户ID
+	userID, exists := middleware.GetCurrentUserID(c)
+	if !exists {
+		utils.Unauthorized(c, "未登录")
+		return
+	}
+
+	var request req.UserUpdateProfileRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		utils.BadRequest(c, "参数错误: "+err.Error())
+		return
+	}
+
+	// 构建更新字段
+	updates := make(map[string]interface{})
+	updates["nickname"] = request.Nickname
+	updates["avatar"] = request.Avatar
+	updates["bio"] = request.Bio
+	updates["email"] = request.Email
+
+	// 使用统一事务处理
+	err := utils.WithTransaction(c, func(ctx context.Context) error {
+		return h.userService.UpdateProfile(ctx, userID, updates)
+	})
+	if err != nil {
+		utils.Error(c, 1005, "更新用户资料失败: "+err.Error())
+		return
+	}
+
+	// 获取更新后的用户信息
+	user, err := h.userService.GetUserByID(c.Request.Context(), userID)
+	if err != nil {
+		utils.Error(c, 1006, "获取用户信息失败")
+		return
+	}
+
+	utils.Success(c, resp.ToUserProfileResponse(user))
+}
