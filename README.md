@@ -43,7 +43,7 @@
 ### 2. 克隆项目
 
 ```bash
-git clone <repository-url>
+git clone https://gitee.com/ming-gogo888/blog.git
 cd blog
 ```
 
